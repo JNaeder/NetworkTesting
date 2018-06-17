@@ -52,7 +52,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: df5a7da46695543da9b0c7877d90f2a6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  playerUnit: {fileID: 1431461597051868, guid: c43431347d2dc304396bd733e23009ad, type: 2}
+  playerUnit: {fileID: 1174611309834534, guid: 5621add743c264ac69bb35c6bee30f98, type: 2}
   playerName: Blank
 --- !u!114 &114768589182326858
 MonoBehaviour:

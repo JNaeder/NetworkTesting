@@ -4,91 +4,100 @@ using UnityEngine;
 using UnityEngine.Networking;
 
 public class GuyController : NetworkBehaviour {
-    [SyncVar]
-    public string playerName = "Blank";
+	
+	[SyncVar]
+	public string playerName = "Blank";
 
-	[Header("Movement Settings")]
-	public float speed;
-	public float jumpStrength;
-	public float fallMult;
-	public float upMult;
-	public float dashSpeed;
-	public float dashLength;
-	public float dashWaitTime;
+	public float speed, jumpStrength, fallMult, upMult;
     public int maxJumpNum;
 
-    public TextMesh displayName; 
+	public TextMesh nameDisplay;
+	public Transform arm;
 
     SpriteRenderer sP;
     Rigidbody2D rB;
 
     int jumpNum;
-    bool facingLeft, isDashing, isDashable;
-	float dashStartTime;
 
-    
 
-    Vector3 newDashPos, transPos, transScale;
+	Vector3 newDashPos;
 
 	// Use this for initialization
 	void Start () {
-        sP = GetComponentInChildren<SpriteRenderer>();
+		sP = GetComponentInChildren<SpriteRenderer>();
         rB = GetComponent<Rigidbody2D>();
-        newDashPos = transform.position;
-		transScale = transform.localScale;
-       
 
-		isDashable = true;
-        
+		nameDisplay.text = playerName;
 	}
 	
 	// Update is called once per frame
-	void FixedUpdate () {
-        displayName.text = playerName;
+	void Update () {
+		if(!hasAuthority){
+			return;
+		}
 
-        if (!hasAuthority) {
-            return;
-        }
-
-        Movement();
-
-
-
+		Movement();
+		ArmAiming();
         
 	}
 
-    [Command]
-    public void CmdFlipSprite(bool flipState) {
-        sP.flipX = flipState;
-        RpcFlipSprite(flipState);
-    }
+	[Command]
+	public void CmdFlipSpriteRenderX(bool isfacingLeft){
+		sP.flipX = isfacingLeft;
+		RpcFlipSpriteRenderX(isfacingLeft);
+	}
 
-    [ClientRpc]
-    public void RpcFlipSprite(bool flipState) {
-        sP.flipX = flipState;
-    }
+	[ClientRpc]
+	public void RpcFlipSpriteRenderX(bool isFacingLeft){
+		sP.flipX = isFacingLeft;
 
-    void Movement() {
-        float h = Input.GetAxis("Horizontal");
-        transPos = transform.position;
-        Dashing();
+	}
+
+    
+	void ArmAiming(){
+		Vector3 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+		Vector2 direction = new Vector2(mousePos.x - arm.position.x, mousePos.y - arm.position.y);
+		CmdArmRotation(direction);
+		arm.right = direction;
+
+	}
+
+	[Command]
+	public void CmdArmRotation(Vector2 rot){
+		
+		RpcArmRoation(rot);
+		if(hasAuthority){
+			arm.right = rot;
+		}
+	}
+
+	[ClientRpc]
+	public void RpcArmRoation(Vector2 rot){
+		if (hasAuthority)
+		{
+			arm.right = rot;
+		}
+
+	}
+    
+
+
+	void Movement(){
+		float h = Input.GetAxis("Horizontal");
 
 
         transform.position += new Vector3(h * speed * Time.deltaTime, 0, 0);
-        //transPos = Vector3.Lerp(transPos, newDashPos, dashSpeed);
 
 
         if (h < 0)
         {
             sP.flipX = true;
-            CmdFlipSprite(true);
-            facingLeft = true;
+			CmdFlipSpriteRenderX(true);
         }
         else if (h > 0)
         {
             sP.flipX = false;
-            CmdFlipSprite(false);
-            facingLeft = false;
+			CmdFlipSpriteRenderX(false);
         }
 
         if (rB.velocity.y < 0)
@@ -101,7 +110,7 @@ public class GuyController : NetworkBehaviour {
         }
 
 
-        if (Input.GetButtonDown("Jump"))
+        if (Input.GetKeyDown(KeyCode.Space))
         {
             if (jumpNum < maxJumpNum)
             {
@@ -111,29 +120,7 @@ public class GuyController : NetworkBehaviour {
 
         }
 
-
-        if (Input.GetKeyDown(KeyCode.Z))
-        {
-            if (isDashable)
-            {
-                dashStartTime = Time.time;
-                if (facingLeft == true)
-                {
-                    newDashPos = new Vector3(transPos.x - dashLength, transPos.y, 0);
-
-                }
-                else if (facingLeft == false)
-                {
-                    newDashPos = new Vector3(transPos.x + dashLength, transPos.y, 0);
-
-                }
-                //transform.position = transPos;
-                isDashing = true;
-                isDashable = false;
-            }
-        }
-
-    }
+	}
 
 
 
@@ -144,25 +131,6 @@ public class GuyController : NetworkBehaviour {
 
     private void OnCollisionExit2D(Collision2D collision)
     {
-
-    }
-
-
-    void Dashing() {
-        if (isDashing)
-        {
-            //print("Dashing");
-            transPos = Vector3.Lerp(transPos, newDashPos, dashSpeed * Time.deltaTime);
-            transform.position = transPos;
-        }
-        if (Mathf.Abs(transform.position.x - newDashPos.x) < .5f) {
-            isDashing = false;
-        }
-
-		if(Time.time > dashStartTime + dashWaitTime){
-			isDashable = true;
-		}
-
 
     }
 }
