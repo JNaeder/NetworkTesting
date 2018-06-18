@@ -8,11 +8,23 @@ public class GuyController : NetworkBehaviour {
 	[SyncVar]
 	public string playerName = "Blank";
 
+	[SyncVar(hook = "UpdateHealth")]
+	public float health = 5.0f;
+
+
+	Vector2 direction;
+
+
+	Transform arm;
+	public Transform muzzle;
+
 	public float speed, jumpStrength, fallMult, upMult;
     public int maxJumpNum;
 
-	public TextMesh nameDisplay;
-	public Transform arm;
+
+	public TextMesh nameDisplay, healthDisplay;
+	public GameObject fireBall;
+
 
     SpriteRenderer sP;
     Rigidbody2D rB;
@@ -24,6 +36,7 @@ public class GuyController : NetworkBehaviour {
 
 	// Use this for initialization
 	void Start () {
+		arm = GetComponentInChildren<Arm>().transform;
 		sP = GetComponentInChildren<SpriteRenderer>();
         rB = GetComponent<Rigidbody2D>();
 
@@ -31,13 +44,16 @@ public class GuyController : NetworkBehaviour {
 	}
 	
 	// Update is called once per frame
-	void Update () {
+	void Update () {  
+
+        healthDisplay.text = health.ToString();
 		if(!hasAuthority){
 			return;
 		}
 
 		Movement();
 		ArmAiming();
+		Shooting();
         
 	}
 
@@ -56,28 +72,33 @@ public class GuyController : NetworkBehaviour {
     
 	void ArmAiming(){
 		Vector3 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-		Vector2 direction = new Vector2(mousePos.x - arm.position.x, mousePos.y - arm.position.y);
-		CmdArmRotation(direction);
+		direction = new Vector2(mousePos.x - arm.position.x, mousePos.y - arm.position.y);
 		arm.right = direction;
-
+		      
 	}
 
 	[Command]
 	public void CmdArmRotation(Vector2 rot){
-		
-		RpcArmRoation(rot);
-		if(hasAuthority){
+
 			arm.right = rot;
-		}
+		RpcArmRotation(rot);
+		
 	}
 
 	[ClientRpc]
-	public void RpcArmRoation(Vector2 rot){
-		if (hasAuthority)
-		{
-			arm.right = rot;
-		}
+	public void RpcArmRotation(Vector2 rot){
+		arm.right = rot;
+        
+	}
 
+	void UpdateHealth(float newHealth){
+		Debug.Log(gameObject.name + " " + newHealth);
+		health = newHealth;
+		healthDisplay.text = health.ToString();
+
+		if(newHealth <= 0){
+			Destroy(gameObject);
+		}
 	}
     
 
@@ -119,6 +140,27 @@ public class GuyController : NetworkBehaviour {
             }
 
         }
+
+	}
+
+	void Shooting(){
+		if(Input.GetButtonDown("Fire1")){
+			CmdFireShotOnServer();
+		}
+
+	}
+
+
+	[Command]
+	public void CmdFireShotOnServer(){
+		GameObject fireB = Instantiate(fireBall, muzzle.position, muzzle.rotation);
+        NetworkServer.Spawn(fireB);
+
+	}
+
+	public void TakeDamage(float damage){
+		print(gameObject.name + " Take Damage " + damage);
+		health -= damage;
 
 	}
 

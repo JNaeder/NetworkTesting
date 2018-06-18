@@ -25,8 +25,8 @@ public class CameraMovement : MonoBehaviour {
         }
 	}
 
-    public void SetPlayer(Transform trans) {
-        diff = new Vector3(0,0,-10) - trans.position;
+	public void SetPlayer(Transform trans, Vector3 camTrans) {
+		diff = camTrans - trans.position;
         player = trans;
     }
 }

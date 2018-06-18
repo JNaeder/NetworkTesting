@@ -51,19 +51,29 @@ public class PlayerObject : NetworkBehaviour {
 	void CmdSpawnPlayer(string n){
         playerName = n;
         Debug.Log(playerName + " has entered Server");
-		gO = Instantiate(playerUnit, Vector3.zero, Quaternion.identity);
+		gO = Instantiate(playerUnit, transform.position, Quaternion.identity);
         GuyController guyCont = gO.GetComponent<GuyController>();
-        guyCont.playerName = playerName;
+		gO.name = playerName;
+        guyCont.playerName = playerName + " Guy";
         NetworkServer.SpawnWithClientAuthority(gO, connectionToClient);
         RpcAssignObject(gO);
+		RpcAssignPlayerNames(playerName, gO);
     }
+
+
+	[ClientRpc]
+	void RpcAssignPlayerNames(string newName, GameObject newGO){
+		newGO.name = playerName;
+
+	}
 
     [ClientRpc]
     void RpcAssignObject(GameObject newPlayerObject) {
-        Debug.Log(gameObject.name + " added camera to this object");
+        //Debug.Log(gameObject.name + " added camera to this object");
         if (hasAuthority)
-        {
-            camMove.SetPlayer(newPlayerObject.transform);
+		{
+			Vector3 camPos = new Vector3(newPlayerObject.transform.position.x, newPlayerObject.transform.position.y, -10);
+			    camMove.SetPlayer(newPlayerObject.transform,camPos);
         }
     }
 
