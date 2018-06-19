@@ -285,7 +285,7 @@ Rigidbody2D:
   m_Material: {fileID: 0}
   m_Interpolate: 0
   m_SleepingMode: 1
-  m_CollisionDetection: 0
+  m_CollisionDetection: 1
   m_Constraints: 4
 --- !u!61 &61301538870615772
 BoxCollider2D:
@@ -366,7 +366,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   playerName: Blank
-  health: 3
+  health: 10
   muzzle: {fileID: 4605046550987666}
   speed: 15
   jumpStrength: 1250

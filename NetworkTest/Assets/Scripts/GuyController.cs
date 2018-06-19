@@ -77,29 +77,7 @@ public class GuyController : NetworkBehaviour {
 		      
 	}
 
-	[Command]
-	public void CmdArmRotation(Vector2 rot){
-
-			arm.right = rot;
-		RpcArmRotation(rot);
-		
-	}
-
-	[ClientRpc]
-	public void RpcArmRotation(Vector2 rot){
-		arm.right = rot;
-        
-	}
-
-	void UpdateHealth(float newHealth){
-		Debug.Log(gameObject.name + " " + newHealth);
-		health = newHealth;
-		healthDisplay.text = health.ToString();
-
-		if(newHealth <= 0){
-			Destroy(gameObject);
-		}
-	}
+	
     
 
 
@@ -143,6 +121,10 @@ public class GuyController : NetworkBehaviour {
 
 	}
 
+
+    /// <summary>
+    /// Shooting
+    /// </summary>
 	void Shooting(){
 		if(Input.GetButtonDown("Fire1")){
 			CmdFireShotOnServer();
@@ -158,11 +140,30 @@ public class GuyController : NetworkBehaviour {
 
 	}
 
-	public void TakeDamage(float damage){
-		print(gameObject.name + " Take Damage " + damage);
-		health -= damage;
 
+    /// <summary>
+    /// Damage and Health
+    /// </summary>
+    [Command]
+    public void CmdTakeDamage(string name, float damage) {
+        Debug.Log(name + " Took " + damage + " damage");
+    }
+
+	public void TakeDamage(float damage){;
+		health -= damage;
+        CmdTakeDamage(gameObject.name, damage);
 	}
+
+    void UpdateHealth(float newHealth)
+    {
+        health = newHealth;
+        healthDisplay.text = health.ToString();
+
+        if (newHealth <= 0)
+        {
+            Destroy(gameObject);
+        }
+    }
 
 
 
