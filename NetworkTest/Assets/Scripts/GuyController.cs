@@ -24,15 +24,13 @@ public class GuyController : NetworkBehaviour {
 
 	public TextMesh nameDisplay, healthDisplay;
 	public GameObject fireBall;
+	public PlayerObject playerObject;
 
 
     SpriteRenderer sP;
     Rigidbody2D rB;
 
     int jumpNum;
-
-
-	Vector3 newDashPos;
 
 	// Use this for initialization
 	void Start () {
@@ -47,6 +45,7 @@ public class GuyController : NetworkBehaviour {
 	void Update () {  
 
         healthDisplay.text = health.ToString();
+		nameDisplay.text = playerName;
 		if(!hasAuthority){
 			return;
 		}
@@ -146,11 +145,17 @@ public class GuyController : NetworkBehaviour {
     /// </summary>
     [Command]
     public void CmdTakeDamage(string name, float damage) {
-        Debug.Log(name + " Took " + damage + " damage");
+        //Debug.Log(name + " Took " + damage + " damage");
+
+		health -= damage;
+		if(health <= 0){
+			Debug.Log("PlayerDied");
+			playerObject.PlayerGuyDeath();
+		}
     }
 
 	public void TakeDamage(float damage){;
-		health -= damage;
+		//health -= damage;
         CmdTakeDamage(gameObject.name, damage);
 	}
 
@@ -160,8 +165,10 @@ public class GuyController : NetworkBehaviour {
         healthDisplay.text = health.ToString();
 
         if (newHealth <= 0)
-        {
-            Destroy(gameObject);
+		{
+			//Debug.Log("Death 1 from " + playerName + "'s Guy");
+            //playerObject.PlayerGuyDeath();
+            //Destroy(gameObject);
         }
     }
 

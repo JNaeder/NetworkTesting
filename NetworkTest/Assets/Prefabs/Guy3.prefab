@@ -368,14 +368,15 @@ MonoBehaviour:
   playerName: Blank
   health: 10
   muzzle: {fileID: 4605046550987666}
-  speed: 15
-  jumpStrength: 1250
+  speed: 18
+  jumpStrength: 1350
   fallMult: 4
   upMult: 3
   maxJumpNum: 2
   nameDisplay: {fileID: 102851653236626748}
   healthDisplay: {fileID: 102768054085564452}
   fireBall: {fileID: 1669614943336628, guid: 480b6e9029207a5418c4629ef330db00, type: 2}
+  playerObject: {fileID: 0}
 --- !u!114 &114255035185554730
 MonoBehaviour:
   m_ObjectHideFlags: 1
