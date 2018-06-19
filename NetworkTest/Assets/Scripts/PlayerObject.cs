@@ -29,8 +29,7 @@ public class PlayerObject : NetworkBehaviour {
 		playerName = n;
 		gameObject.name = playerName;
 
-
-        nS.EnableStartScreen();
+        
         
     }
 	

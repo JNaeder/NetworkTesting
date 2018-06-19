@@ -5,29 +5,28 @@ using UnityEngine.Networking;
 
 public class NetworkStuff : NetworkBehaviour {
 
-    public Camera startCam;
+    
     public GameObject startScreen;
 
-	// Use this for initialization
-	void Start () {
-		
-	}
-	
-	// Update is called once per frame
-	void Update () {
-		
-	}
+    PlayerObject player;
+
+    private void Start()
+    {
+        player = FindObjectOfType<PlayerObject>();
+
+    }
 
 
     public void DisableCamera() {
-        Debug.Log("DisableCamera");
-        startCam.gameObject.SetActive(false);
         startScreen.SetActive(false);
 
     }
 
-    public void EnableStartScreen() {
-        startScreen.SetActive(true);
+    
+
+    public void SpawnPlayer() {
+        Debug.Log("Spawn!");
+        player.CmdSpawnPlayer(player.playerName);
 
     }
     
