@@ -167,6 +167,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   playerUnit: {fileID: 1174611309834534, guid: 5621add743c264ac69bb35c6bee30f98, type: 2}
+  startScreen: {fileID: 1179026964602172}
   playerName: Blank
 --- !u!114 &114383919180504186
 MonoBehaviour:

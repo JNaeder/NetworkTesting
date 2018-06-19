@@ -166,10 +166,16 @@ public class GuyController : NetworkBehaviour {
 
         if (newHealth <= 0)
 		{
-			//Debug.Log("Death 1 from " + playerName + "'s Guy");
-            //playerObject.PlayerGuyDeath();
-            //Destroy(gameObject);
+            //Debug.Log("Death 1 from " + playerName + "'s Guy");
+            RpcPlayerDeath();
+            Destroy(gameObject);
         }
+    }
+
+    [ClientRpc]
+    void RpcPlayerDeath() {
+
+        playerObject.PlayerGuyDeath();
     }
 
 
