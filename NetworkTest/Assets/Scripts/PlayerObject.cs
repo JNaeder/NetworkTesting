@@ -14,20 +14,23 @@ public class PlayerObject : NetworkBehaviour {
     CameraMovement camMove;
     GameObject gO;
 
+    NetworkStuff nS;
+
 	// Use this for initialization
 	void Start () {
-
         if (isLocalPlayer == false){
 			return;
 		}
+        nS = FindObjectOfType<NetworkStuff>();
         camMove = Camera.main.GetComponent<CameraMovement>();
+
+
 		string n = "Dr_Monkfish" + Random.Range(1, 100);
 		playerName = n;
-        Debug.Log("I am " + playerName);
 		gameObject.name = playerName;
-        CmdSpawnPlayer(playerName);
 
-		//nameInput.gameObject.SetActive(false);
+
+        nS.EnableStartScreen();
         
     }
 	
@@ -36,25 +39,18 @@ public class PlayerObject : NetworkBehaviour {
         if (!isLocalPlayer){
             return;
         }
-
-
-
-        
-		
-
-
 	}
     
 
 
 	[Command]
-	void CmdSpawnPlayer(string n){
+	public void CmdSpawnPlayer(string n){
         playerName = n;
         Debug.Log(playerName + " has entered Server");
 		gO = Instantiate(playerUnit, transform.position, Quaternion.identity);
         GuyController guyCont = gO.GetComponent<GuyController>();
 		gO.name = playerName;
-        guyCont.playerName = playerName + " Guy";
+        guyCont.playerName = playerName;
         NetworkServer.SpawnWithClientAuthority(gO, connectionToClient);
         RpcAssignObject(gO);
 		RpcAssignPlayerNames(playerName, gO);
@@ -63,7 +59,7 @@ public class PlayerObject : NetworkBehaviour {
 
 	[ClientRpc]
 	void RpcAssignPlayerNames(string newName, GameObject newGO){
-		newGO.name = playerName;
+		newGO.name = newName;
 
 	}
 
