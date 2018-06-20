@@ -372,7 +372,7 @@ MonoBehaviour:
   jumpStrength: 1350
   fallMult: 4
   upMult: 3
-  maxJumpNum: 2
+  maxJumpNum: 3
   nameDisplay: {fileID: 102851653236626748}
   healthDisplay: {fileID: 102768054085564452}
   fireBall: {fileID: 1669614943336628, guid: 480b6e9029207a5418c4629ef330db00, type: 2}

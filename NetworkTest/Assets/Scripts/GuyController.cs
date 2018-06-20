@@ -13,7 +13,7 @@ public class GuyController : NetworkBehaviour {
 
 
 	Vector2 direction;
-
+	public Color startColor;
 
 	Transform arm;
 	public Transform muzzle;
@@ -30,13 +30,21 @@ public class GuyController : NetworkBehaviour {
     SpriteRenderer sP;
     Rigidbody2D rB;
 
-    int jumpNum;
 
+    int jumpNum;
 	// Use this for initialization
 	void Start () {
 		arm = GetComponentInChildren<Arm>().transform;
 		sP = GetComponentInChildren<SpriteRenderer>();
         rB = GetComponent<Rigidbody2D>();
+
+		sP.color = startColor;
+		if (hasAuthority)
+		{
+			
+            sP.color = startColor;
+			CmdSetColor(startColor);
+		}
 
 		nameDisplay.text = playerName;
 	}
@@ -54,6 +62,19 @@ public class GuyController : NetworkBehaviour {
 		ArmAiming();
 		Shooting();
         
+	}
+
+
+	[Command]
+	void CmdSetColor(Color newColor){
+		sP.color = newColor;
+		RpcSetColor(newColor);
+	}
+
+	[ClientRpc]
+	void RpcSetColor(Color newColor){
+
+		sP.color = newColor;
 	}
 
 	[Command]
@@ -125,6 +146,7 @@ public class GuyController : NetworkBehaviour {
     /// Shooting
     /// </summary>
 	void Shooting(){
+
 		if(Input.GetButtonDown("Fire1")){
 			CmdFireShotOnServer();
 		}
@@ -135,6 +157,8 @@ public class GuyController : NetworkBehaviour {
 	[Command]
 	public void CmdFireShotOnServer(){
 		GameObject fireB = Instantiate(fireBall, muzzle.position, muzzle.rotation);
+		SpriteRenderer fireBSP = fireB.GetComponent<SpriteRenderer>();
+		fireBSP.color = startColor;
         NetworkServer.Spawn(fireB);
 
 	}
@@ -167,14 +191,13 @@ public class GuyController : NetworkBehaviour {
         if (newHealth <= 0)
 		{
             //Debug.Log("Death 1 from " + playerName + "'s Guy");
-            RpcPlayerDeath();
+			RpcPlayerDeath();
             Destroy(gameObject);
         }
     }
-
+    
     [ClientRpc]
-    void RpcPlayerDeath() {
-
+	void RpcPlayerDeath() {
         playerObject.PlayerGuyDeath();
     }
 

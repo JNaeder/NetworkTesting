@@ -5,15 +5,19 @@ using UnityEngine.Networking;
 using UnityEngine.UI;
 
 public class PlayerObject : NetworkBehaviour {
-
+    
 	public GameObject playerUnit;
 	public GameObject startScreen;
+	public Image guyPreview;
+
+	Color playerColor = Color.white;
 
 	[SyncVar]
     public string playerName = "Blank";
 
     CameraMovement camMove;
     GameObject gO;
+	SpawnPoints spawnP;
 
 	// Use this for initialization
 	void Start () {
@@ -22,10 +26,10 @@ public class PlayerObject : NetworkBehaviour {
 		}
 
         camMove = Camera.main.GetComponent<CameraMovement>();
+		spawnP = FindObjectOfType<SpawnPoints>();
 
-
-		string n = "Dr_Monkfish" + Random.Range(1, 100);
-		playerName = n;
+		//string n = "Dr_Monkfish" + Random.Range(1, 100);
+		//playerName = n;
 		gameObject.name = playerName;
 		CmdChangeName(playerName);
         
@@ -37,24 +41,18 @@ public class PlayerObject : NetworkBehaviour {
 		if (isLocalPlayer)
 		{
 			CmdSpawnPlayer(playerName);
-			CmdSayStartScreen(false, gameObject.name);
 			startScreen.SetActive(false);
 		}
 
 	}
 
-	[Command]
-	void CmdSayStartScreen(bool status, string newName){
-		Debug.Log(newName + " Start Screen is " + status);
-
-	}
 
 
 	[Command]
 	public void CmdSpawnPlayer(string n){
         playerName = n;
-
-		gO = Instantiate(playerUnit, transform.position, Quaternion.identity);
+		Vector3 spawnPos = spawnP.GenerateRandomSpawnPoint();
+		gO = Instantiate(playerUnit, spawnPos, Quaternion.identity);
 
 		NetworkServer.SpawnWithClientAuthority(gO, connectionToClient);
 
@@ -62,12 +60,15 @@ public class PlayerObject : NetworkBehaviour {
         GuyController guyCont = gO.GetComponent<GuyController>();
 
 		//Debug.Log("Test");
-		gO.name = playerName + "'s Guy";
+		gO.name = gameObject.name + "'s Guy";
 		guyCont.playerName = playerName;
 		guyCont.playerObject = this;
+		guyCont.startColor = playerColor;
+
+
 		RpcAssignPlayerObjects(gO);
-        RpcAssignObject(gO);
-		RpcAssignPlayerNames(playerName + "'s Guy", gO);
+		RpcAssignPlayerNames(gameObject.name + "'s Guy", gO);
+		RpcSetCamToObject(gO);
 
 
     }
@@ -97,8 +98,10 @@ public class PlayerObject : NetworkBehaviour {
 
 	}
 
+
+    //I Need This
     [ClientRpc]
-    void RpcAssignObject(GameObject newPlayerObject) {
+    void RpcSetCamToObject(GameObject newPlayerObject) {
         if (hasAuthority)
 		{
 			Vector3 camPos = new Vector3(newPlayerObject.transform.position.x, newPlayerObject.transform.position.y, -10);
@@ -109,11 +112,48 @@ public class PlayerObject : NetworkBehaviour {
 
 
 	public void PlayerGuyDeath(){
-		Debug.Log("Restart Start Screen!");
+		//Debug.Log("Restart Start Screen!");
 		startScreen.SetActive(true);
-		CmdSayStartScreen(true, gameObject.name);
 
 
+	}
+
+	public void UpdateName(string newName){
+		playerName = newName;
+		gameObject.name = newName;
+	}
+
+
+
+	public void UpdateColor(int num){
+		if (num == 0)
+		{
+			playerColor = new Color(1, 1, 1, 1);
+		}
+		else if (num == 1)
+		{
+			playerColor = Color.red;
+		}
+		else if (num == 2)
+		{
+			playerColor = Color.blue;
+		}
+		else if (num == 3)
+		{
+			playerColor = Color.yellow;
+		}
+		else if (num == 4)
+		{
+			playerColor = Color.green;
+		}
+		else if (num == 5)
+		{
+			playerColor = Color.magenta;
+		}
+
+
+
+		guyPreview.color = playerColor;
 	}
 
 
