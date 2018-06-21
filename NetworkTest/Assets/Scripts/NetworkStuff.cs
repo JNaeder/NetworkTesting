@@ -7,12 +7,10 @@ public class NetworkStuff : NetworkBehaviour {
 
     
     public GameObject startScreen;
-
-    PlayerObject player;
+    
 
     private void Start()
     {
-        player = FindObjectOfType<PlayerObject>();
 
     }
 
@@ -26,7 +24,6 @@ public class NetworkStuff : NetworkBehaviour {
 
     public void SpawnPlayer() {
         Debug.Log("Spawn!");
-        player.CmdSpawnPlayer(player.playerName);
 
     }
     

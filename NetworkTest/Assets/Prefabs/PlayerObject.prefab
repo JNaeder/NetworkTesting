@@ -690,7 +690,8 @@ MonoBehaviour:
   playerUnit: {fileID: 1174611309834534, guid: 5621add743c264ac69bb35c6bee30f98, type: 2}
   startScreen: {fileID: 1179026964602172}
   guyPreview: {fileID: 114780593079323622}
-  playerName: Blank
+  playerColor: {r: 1, g: 1, b: 1, a: 1}
+  playerName: I'm Too Lazy To Change My Name
 --- !u!114 &114321118630483068
 MonoBehaviour:
   m_ObjectHideFlags: 1

@@ -10,24 +10,24 @@ public class PlayerObject : NetworkBehaviour {
 	public GameObject startScreen;
 	public Image guyPreview;
 
-	Color playerColor = Color.white;
+    [SyncVar]
+	public Color playerColor = Color.white;
 
 	[SyncVar]
-    public string playerName = "Blank";
+    public string playerName = "I'm Too Lazy To Change My Name";
 
     CameraMovement camMove;
     GameObject gO;
 	SpawnPoints spawnP;
+    Vector3 spawnPos;
 
-	// Use this for initialization
-	void Start () {
+    // Use this for initialization
+    void Start () {
         if (isLocalPlayer == false){
 			return;
 		}
-
         camMove = Camera.main.GetComponent<CameraMovement>();
 		spawnP = FindObjectOfType<SpawnPoints>();
-
 		//string n = "Dr_Monkfish" + Random.Range(1, 100);
 		//playerName = n;
 		gameObject.name = playerName;
@@ -40,19 +40,21 @@ public class PlayerObject : NetworkBehaviour {
 	public void SpawnPlayerGuy(){
 		if (isLocalPlayer)
 		{
-			CmdSpawnPlayer(playerName);
+            spawnPos = spawnP.GenerateRandomSpawnPoint();
+            CmdSpawnPlayer(playerName, spawnPos, playerColor);
 			startScreen.SetActive(false);
-		}
+            
+        }
 
 	}
 
 
 
 	[Command]
-	public void CmdSpawnPlayer(string n){
+	public void CmdSpawnPlayer(string n, Vector3 sPos, Color pColor){
         playerName = n;
-		Vector3 spawnPos = spawnP.GenerateRandomSpawnPoint();
-		gO = Instantiate(playerUnit, spawnPos, Quaternion.identity);
+		
+		gO = Instantiate(playerUnit, sPos, Quaternion.identity);
 
 		NetworkServer.SpawnWithClientAuthority(gO, connectionToClient);
 
@@ -63,12 +65,13 @@ public class PlayerObject : NetworkBehaviour {
 		gO.name = gameObject.name + "'s Guy";
 		guyCont.playerName = playerName;
 		guyCont.playerObject = this;
-		guyCont.startColor = playerColor;
+		guyCont.startColor = pColor;
 
 
 		RpcAssignPlayerObjects(gO);
 		RpcAssignPlayerNames(gameObject.name + "'s Guy", gO);
 		RpcSetCamToObject(gO);
+        RpcAssignPlayerColor(pColor, gO);
 
 
     }
@@ -98,6 +101,23 @@ public class PlayerObject : NetworkBehaviour {
 
 	}
 
+    [ClientRpc]
+    void RpcAssignPlayerColor(Color pColor, GameObject newGO) {
+        GuyController guyCont = newGO.GetComponent<GuyController>();
+        guyCont.startColor = playerColor;
+    }
+
+    [Command]
+    void CmdUpdateColorOnServer(Color newColor)
+    {
+        playerColor = newColor;
+        RpcUpdateColorClient(newColor);
+    }
+
+    [ClientRpc]
+    void RpcUpdateColorClient(Color newColor) {
+        playerColor = newColor;
+    }
 
     //I Need This
     [ClientRpc]
@@ -154,6 +174,7 @@ public class PlayerObject : NetworkBehaviour {
 
 
 		guyPreview.color = playerColor;
+        CmdUpdateColorOnServer(playerColor);
 	}
 
 

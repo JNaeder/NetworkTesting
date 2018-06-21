@@ -319,7 +319,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   speed: 5
-  playerName: blank
+  playerName: I'm Too Lazy To Change My Name
   health: 5
   titleName: {fileID: 102677392055281394}
   healthNumber: {fileID: 102841505915757232}

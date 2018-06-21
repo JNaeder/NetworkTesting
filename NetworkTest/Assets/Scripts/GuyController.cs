@@ -6,14 +6,16 @@ using UnityEngine.Networking;
 public class GuyController : NetworkBehaviour {
 	
 	[SyncVar]
-	public string playerName = "Blank";
+	public string playerName = "I'm Too Lazy To Change My Name";
 
 	[SyncVar(hook = "UpdateHealth")]
 	public float health = 5.0f;
 
 
 	Vector2 direction;
-	public Color startColor;
+
+    [SyncVar]
+	public Color startColor = Color.cyan;
 
 	Transform arm;
 	public Transform muzzle;
@@ -23,12 +25,16 @@ public class GuyController : NetworkBehaviour {
 
 
 	public TextMesh nameDisplay, healthDisplay;
+    public SpriteRenderer healthBarGreen;
 	public GameObject fireBall;
 	public PlayerObject playerObject;
 
 
     SpriteRenderer sP;
     Rigidbody2D rB;
+
+
+    float healthBarStartSize, healthBarNewSize, startHealth;
 
 
     int jumpNum;
@@ -38,11 +44,14 @@ public class GuyController : NetworkBehaviour {
 		sP = GetComponentInChildren<SpriteRenderer>();
         rB = GetComponent<Rigidbody2D>();
 
+        startHealth = health;
+        healthBarStartSize = healthBarGreen.transform.localScale.x;
+
 		sP.color = startColor;
-		if (hasAuthority)
+        if (hasAuthority)
 		{
 			
-            sP.color = startColor;
+           // sP.color = startColor;
 			CmdSetColor(startColor);
 		}
 
@@ -52,8 +61,12 @@ public class GuyController : NetworkBehaviour {
 	// Update is called once per frame
 	void Update () {  
 
-        healthDisplay.text = health.ToString();
+        //healthDisplay.text = health.ToString();
 		nameDisplay.text = playerName;
+        UpdateHealthBar();
+        
+
+
 		if(!hasAuthority){
 			return;
 		}
@@ -97,7 +110,12 @@ public class GuyController : NetworkBehaviour {
 		      
 	}
 
-	
+    void UpdateHealthBar() {
+        float healthBarPerc = health / startHealth;
+        Vector3 healthBarScale = healthBarGreen.transform.localScale;
+        healthBarScale.x = healthBarStartSize * healthBarPerc;
+        healthBarGreen.transform.localScale = healthBarScale;
+    }
     
 
 
@@ -159,9 +177,18 @@ public class GuyController : NetworkBehaviour {
 		GameObject fireB = Instantiate(fireBall, muzzle.position, muzzle.rotation);
 		SpriteRenderer fireBSP = fireB.GetComponent<SpriteRenderer>();
 		fireBSP.color = startColor;
+        
         NetworkServer.Spawn(fireB);
+        RpcSetShotColor(fireB, startColor);
 
-	}
+    }
+
+    [ClientRpc]
+    void RpcSetShotColor(GameObject fireB, Color ballColor) {
+        SpriteRenderer fireBSP = fireB.GetComponent<SpriteRenderer>();
+        fireBSP.color = ballColor;
+
+    }
 
 
     /// <summary>
@@ -190,15 +217,17 @@ public class GuyController : NetworkBehaviour {
 
         if (newHealth <= 0)
 		{
-            //Debug.Log("Death 1 from " + playerName + "'s Guy");
-			RpcPlayerDeath();
+            RpcPlayerDeath();
             Destroy(gameObject);
         }
     }
     
     [ClientRpc]
 	void RpcPlayerDeath() {
-        playerObject.PlayerGuyDeath();
+        if (hasAuthority)
+        {
+            playerObject.PlayerGuyDeath();
+        }
     }
 
 
