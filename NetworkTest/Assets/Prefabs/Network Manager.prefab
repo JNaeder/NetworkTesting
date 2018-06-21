@@ -80,8 +80,8 @@ MonoBehaviour:
     type: 2}
   m_AutoCreatePlayer: 1
   m_PlayerSpawnMethod: 0
-  m_OfflineScene: 
-  m_OnlineScene: TestPlatform1
+  m_OfflineScene: Lobby
+  m_OnlineScene: TestPlatform2
   m_SpawnPrefabs:
   - {fileID: 1174611309834534, guid: 5621add743c264ac69bb35c6bee30f98, type: 2}
   - {fileID: 1669614943336628, guid: 480b6e9029207a5418c4629ef330db00, type: 2}

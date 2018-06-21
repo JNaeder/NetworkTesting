@@ -9,8 +9,18 @@ public class Ball : MonoBehaviour {
 	public float speed;
 	public float damage;
 
+    ParticleSystem pS;
+    SpriteRenderer sP;
+
+
 	// Use this for initialization
 	void Start () {
+
+        pS = GetComponent<ParticleSystem>();
+        sP = GetComponent<SpriteRenderer>();
+
+        Color spriteColor = sP.color;
+        pS.startColor = spriteColor;
 	}
 	
 	// Update is called once per frame

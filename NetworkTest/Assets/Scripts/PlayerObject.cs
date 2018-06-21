@@ -58,7 +58,6 @@ public class PlayerObject : NetworkBehaviour {
 
 		NetworkServer.SpawnWithClientAuthority(gO, connectionToClient);
 
-
         GuyController guyCont = gO.GetComponent<GuyController>();
 
 		//Debug.Log("Test");

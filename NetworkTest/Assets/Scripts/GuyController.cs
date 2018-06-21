@@ -49,11 +49,14 @@ public class GuyController : NetworkBehaviour {
 
 		sP.color = startColor;
         if (hasAuthority)
-		{
-			
-           // sP.color = startColor;
-			CmdSetColor(startColor);
-		}
+        {
+            gameObject.layer = 8;
+            // sP.color = startColor;
+            CmdSetColor(startColor);
+        }
+        else {
+            gameObject.layer = 9;
+        }
 
 		nameDisplay.text = playerName;
 	}
